@@ -1,5 +1,8 @@
+# Test fille for messageQueue.
 import json
 import time
+import unittest.mock
+from unittest.mock import MagicMock, ANY
 from messageQueue import create_message, Producer, Queue, Consumer
 
 def test_create_message():
@@ -52,18 +55,18 @@ def test_queue_replay_from():
     assert len(replayed_messages) == 1
     assert replayed_messages[0]["payload"] == "Message 2"
 
-def test_consumer_pull_msg(mocker):
+def test_consumer_pull_msg():
     queue = Queue()
     producer = Producer(queue)
     consumer = Consumer(queue)
 
     producer.publish_msg("Hello, Consumer!")
 
-    with mocker.patch("builtins.print") as mocked_print:
+    with unittest.mock.patch('builtins.print') as mocked_print:
         consumer.pull_msg()
 
         assert len(queue.storage) == 0
-        mocked_print.assert_called_once_with("Consumed message: {'id': ANY, 'timestamp': ANY, 'payload': 'Hello, Consumer!'}")
+        mocked_print.assert_called_once_with(f"Consumed message: {{'id': {ANY}, 'timestamp': {ANY}, 'payload': 'Hello, Consumer!'}}")
 
 if __name__ == "__main__":
     test_create_message()
