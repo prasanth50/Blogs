@@ -1,8 +1,5 @@
 import json
 import time
-import threading
-from collections import deque
-import uuid
 from messageQueue import create_message, Producer, Queue, Consumer
 
 def test_create_message():
@@ -61,11 +58,12 @@ def test_consumer_pull_msg(mocker):
     consumer = Consumer(queue)
 
     producer.publish_msg("Hello, Consumer!")
-    mocker.patch("builtins.print")
-    consumer.pull_msg()
 
-    assert len(queue.storage) == 0
-    builtins.print.assert_called_once_with("Consumed message: {'id': ANY, 'timestamp': ANY, 'payload': 'Hello, Consumer!'}")
+    with mocker.patch("builtins.print") as mocked_print:
+        consumer.pull_msg()
+
+        assert len(queue.storage) == 0
+        mocked_print.assert_called_once_with("Consumed message: {'id': ANY, 'timestamp': ANY, 'payload': 'Hello, Consumer!'}")
 
 if __name__ == "__main__":
     test_create_message()
